@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduNotes Pro - Student Notes App</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      min-height: 100vh;
+      color: white;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 40px;
+      letter-spacing: 2px;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 20px;
+    }
+
+    .sidebar,
+    .main {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+
+    .section-title {
+      font-size: 22px;
+      margin-bottom: 15px;
+      color: #ffd369;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 250px;
+      resize: vertical;
+    }
+
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-right: 10px;
+      margin-top: 10px;
+      transition: 0.3s;
+      font-weight: bold;
+    }
+
+    .save-btn {
+      background: #00c853;
+      color: white;
+    }
+
+    .save-btn:hover {
+      background: #00a844;
+    }
+
+    .delete-btn {
+      background: #ff1744;
+      color: white;
+    }
+
+    .delete-btn:hover {
+      background: #d50032;
+    }
+
+    .download-btn {
+      background: #2962ff;
+      color: white;
+    }
+
+    .download-btn:hover {
+      background: #0039cb;
+    }
+
+    .theme-btn {
+      background: #ffb300;
+      color: black;
+    }
+
+    .theme-btn:hover {
+      background: #ff8f00;
+    }
+
+    .note-list {
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    .note-item {
+      background: rgba(255,255,255,0.15);
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .note-item:hover {
+      transform: scale(1.02);
+      background: rgba(255,255,255,0.25);
+    }
+
+    .subject-tag {
+      display: inline-block;
+      background: #ffd369;
+      color: black;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      margin-top: 8px;
+      font-weight: bold;
+    }
+
+    .stats {
+      margin-top: 20px;
+      background: rgba(255,255,255,0.15);
+      padding: 15px;
+      border-radius: 15px;
+    }
+
+    .dark-mode {
+      background: linear-gradient(135deg, #111, #222);
+    }
+
+    .purple-mode {
+      background: linear-gradient(135deg, #5f2c82, #49a09d);
+    }
+
+    .green-mode {
+      background: linear-gradient(135deg, #134e5e, #71b280);
+    }
+
+    .sunset-mode {
+      background: linear-gradient(135deg, #ff512f, #dd2476);
+    }
+
+    .logo-container {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .logo {
+      width: 100px;
+      height: 100px;
+      margin: auto;
+      border-radius: 50%;
+      background: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 50px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+      margin-bottom: 15px;
+    }
+
+    .tagline {
+      font-size: 18px;
+      margin-top: 8px;
+      color: #ffd369;
+      letter-spacing: 1px;
+    }
+
+    .search-box {
+      margin-bottom: 15px;
+    }
+
+    .clock {
+      text-align: center;
+      font-size: 18px;
+      margin-bottom: 20px;
+      color: #ffd369;
+      font-weight: bold;
+    }
+
+    @media (max-width: 900px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="logo-container">
+    <div class="logo">📘</div>
+    <h1>EduNotes Pro</h1>
+    <p class="tagline">Smart Notes App For Students</p>
+  </div>
+
+  <div class="clock" id="clock"></div>
+
+  <div class="container">
+
+    <div class="sidebar">
+      <div class="section-title">📖 Your Notes</div>
+
+      <input type="text" id="search" class="search-box" placeholder="Search notes..." onkeyup="searchNotes()">
+
+      <div class="note-list" id="noteList"></div>
+
+      <div class="stats">
+        <h3>📊 Student Dashboard</h3>
+        <p>Total Notes: <span id="totalNotes">0</span></p>
+        <p>Total Subjects: <span id="totalSubjects">0</span></p>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="section-title">✍ Create Notes</div>
+
+      <input type="text" id="title" placeholder="Enter Note Title">
+
+      <select id="subject">
+        <option value="Science">Science</option>
+        <option value="Mathematics">Mathematics</option>
+        <option value="English">English</option>
+        <option value="Social Science">Social Science</option>
+        <option value="Computer">Computer</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <textarea id="content" placeholder="Write your notes here..."></textarea>
+
+      <button class="save-btn" onclick="saveNote()">💾 Save Note</button>
+      <button class="delete-btn" onclick="deleteNote()">🗑 Delete</button>
+      <button class="download-btn" onclick="downloadNote()">⬇ Download</button>
+      <button class="theme-btn" onclick="toggleTheme()">🌙 Dark</button>
+      <button class="theme-btn" onclick="purpleTheme()">💜 Purple</button>
+      <button class="theme-btn" onclick="greenTheme()">💚 Green</button>
+      <button class="theme-btn" onclick="sunsetTheme()">🌅 Sunset</button>
+
+    </div>
+
+  </div>
+
+  <script>
+    let notes = JSON.parse(localStorage.getItem('studentNotes')) || [];
+    let selectedIndex = null;
+
+    function saveNote() {
+      const title = document.getElementById('title').value;
+      const subject = document.getElementById('subject').value;
+      const content = document.getElementById('content').value;
+
+      if(title === '' || content === '') {
+        alert('Please fill all fields!');
+        return;
+      }
+
+      const note = {
+        title,
+        subject,
+        content,
+        date: new Date().toLocaleString()
+      };
+
+      if(selectedIndex !== null) {
+        notes[selectedIndex] = note;
+      } else {
+        notes.push(note);
+      }
+
+      localStorage.setItem('studentNotes', JSON.stringify(notes));
+
+      clearFields();
+      displayNotes();
+    }
+
+    function displayNotes() {
+      const noteList = document.getElementById('noteList');
+      noteList.innerHTML = '';
+
+      notes.forEach((note, index) => {
+        noteList.innerHTML += `
+          <div class="note-item" onclick="loadNote(${index})">
+            <h3>${note.title}</h3>
+            <small>${note.date}</small><br>
+            <span class="subject-tag">${note.subject}</span>
+          </div>
+        `;
+      });
+
+      document.getElementById('totalNotes').innerText = notes.length;
+
+      const subjects = [...new Set(notes.map(note => note.subject))];
+      document.getElementById('totalSubjects').innerText = subjects.length;
+    }
+
+    function loadNote(index) {
+      const note = notes[index];
+
+      document.getElementById('title').value = note.title;
+      document.getElementById('subject').value = note.subject;
+      document.getElementById('content').value = note.content;
+
+      selectedIndex = index;
+    }
+
+    function deleteNote() {
+      if(selectedIndex === null) {
+        alert('Select a note first!');
+        return;
+      }
+
+      notes.splice(selectedIndex, 1);
+      localStorage.setItem('studentNotes', JSON.stringify(notes));
+
+      selectedIndex = null;
+      clearFields();
+      displayNotes();
+    }
+
+    function clearFields() {
+      document.getElementById('title').value = '';
+      document.getElementById('content').value = '';
+      selectedIndex = null;
+    }
+
+    function searchNotes() {
+      const search = document.getElementById('search').value.toLowerCase();
+      const noteItems = document.querySelectorAll('.note-item');
+
+      noteItems.forEach(item => {
+        if(item.innerText.toLowerCase().includes(search)) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+
+    function downloadNote() {
+      const title = document.getElementById('title').value;
+      const content = document.getElementById('content').value;
+
+      if(title === '' || content === '') {
+        alert('No note to download!');
+        return;
+      }
+
+      const blob = new Blob([content], { type: 'text/plain' });
+      const a = document.createElement('a');
+
+      a.href = URL.createObjectURL(blob);
+      a.download = title + '.txt';
+      a.click();
+    }
+
+    function removeThemes() {
+      document.body.classList.remove('dark-mode');
+      document.body.classList.remove('purple-mode');
+      document.body.classList.remove('green-mode');
+      document.body.classList.remove('sunset-mode');
+    }
+
+    function toggleTheme() {
+      removeThemes();
+      document.body.classList.add('dark-mode');
+    }
+
+    function purpleTheme() {
+      removeThemes();
+      document.body.classList.add('purple-mode');
+    }
+
+    function greenTheme() {
+      removeThemes();
+      document.body.classList.add('green-mode');
+    }
+
+    function sunsetTheme() {
+      removeThemes();
+      document.body.classList.add('sunset-mode');
+    }
+
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('clock').innerText = '🕒 ' + now.toLocaleString();
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    displayNotes();
+  </script>
+
+</body>
+</html>
